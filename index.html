@@ -420,6 +420,392 @@
           <!-- Actions -->
           <div class="flex gap-2">
             <button onclick="shareResult()" class="ns-ghost-btn flex-1">Share 🔗</button>
+            <button onclick="clearResults()" class="      --font-u:  'DM Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-u);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ocean-inspired dot grid */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        radial-gradient(ellipse 60% 50% at 50% -10%, rgba(14,165,233,0.08) 0%, transparent 70%),
+        radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 28px 28px;
+    }
+
+    /* Light mode */
+    body.light {
+      --bg:     #f0f2f8;
+      --card:   #ffffff;
+      --border: #d0d4e8;
+      --muted:  #6b7090;
+      --text:   #1a1c2e;
+    }
+    body.light::before {
+      background-image:
+        radial-gradient(ellipse 60% 50% at 50% -10%, rgba(14,165,233,0.05) 0%, transparent 70%),
+        radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 28px 28px;
+    }
+    body.light .ns-header    { background: rgba(240,242,248,.9) !important; border-color: var(--border) !important; }
+    body.light .ns-card      { background: var(--card); border-color: var(--border); }
+    body.light .ns-inset     { background: #eef0f8 !important; border-color: #cdd2e8 !important; }
+    body.light .ns-input     { background: #fff !important; border-color: var(--border) !important; color: var(--text) !important; }
+    body.light .ns-modal-bg  { background: #fff; border-color: var(--border); }
+    body.light .ns-ghost-btn { border-color: var(--border); color: var(--muted); }
+    body.light .ns-stat      { background: #eef0f8; border-color: #cdd2e8; }
+    body.light .ns-shimmer   { background: linear-gradient(90deg,#dde0ef 25%,#eef0f8 50%,#dde0ef 75%) !important; }
+    body.light .ns-version   { background: #dde0ef !important; border-color: #cdd2e8 !important; color: #6b7090 !important; }
+    body.light .ns-marine-block { background: #eef0f8 !important; }
+
+    .font-d { font-family: var(--font-d); }
+    .font-m { font-family: var(--font-m); }
+
+    .ns-card      { background: var(--card); border: 1px solid var(--border); border-radius: 18px; }
+    .ns-inset     { background: #0a0b12; border: 1px solid var(--border); border-radius: 14px; }
+    .ns-stat      { background: #0a0b12; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .ns-badge     { background: rgba(14,165,233,0.07); border: 1px solid rgba(14,165,233,0.2); border-radius: 14px; }
+    .ns-marine-block { background: rgba(14,165,233,.04); border-radius: 16px; }
+
+    .ns-input {
+      background: #0f1018; border: 1px solid var(--border);
+      color: var(--text); border-radius: 14px; font-family: var(--font-m);
+      font-size: 13px; padding: 14px 110px 14px 16px; width: 100%;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .ns-input::placeholder { color: var(--muted); }
+    .ns-input:focus {
+      outline: none;
+      border-color: var(--ocean);
+      box-shadow: 0 0 0 3px rgba(14,165,233,.1);
+    }
+
+    .ns-btn-main {
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .03em;
+      border-radius: 10px; padding: 10px 16px;
+      transition: filter .15s, transform .1s;
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      white-space: nowrap;
+    }
+    .ns-btn-main:hover  { filter: brightness(1.1); }
+    .ns-btn-main:active { filter: brightness(.95); transform: translateY(-50%) scale(.98); }
+
+    .ns-ghost-btn {
+      border: 1px solid var(--border); color: var(--muted); border-radius: 12px;
+      padding: 10px 14px; font-size: 13px; font-weight: 500;
+      transition: background .15s, color .15s;
+    }
+    .ns-ghost-btn:hover { background: rgba(255,255,255,.04); color: var(--text); }
+
+    /* Rank gradients */
+    .rg-ancient  { background: linear-gradient(130deg, #fde68a, #f59e0b, #b45309); }
+    .rg-og       { background: linear-gradient(130deg, #c4b5fd, #7c3aed, #4c1d95); }
+    .rg-veteran  { background: linear-gradient(130deg, #6ee7b7, #059669, #064e3b); }
+    .rg-survivor { background: linear-gradient(130deg, #93c5fd, #3b82f6, #1e3a8a); }
+    .rg-newborn  { background: linear-gradient(130deg, #d1d5db, #9ca3af, #4b5563); }
+
+    /* Marine tier pills */
+    .tier-whale   { background: rgba(14,165,233,.12); border: 1px solid rgba(14,165,233,.3); color: #38bdf8; }
+    .tier-dolphin { background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.3); color: #818cf8; }
+    .tier-fish    { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.3); color: #34d399; }
+    .tier-crab    { background: rgba(249,115,22,.12); border: 1px solid rgba(249,115,22,.3); color: #fb923c; }
+    .tier-shrimp  { background: rgba(244,63,94,.12);  border: 1px solid rgba(244,63,94,.3);  color: #fb7185; }
+
+    /* Shimmer */
+    .ns-shimmer {
+      background: linear-gradient(90deg, #131420 25%, #1c1e30 50%, #131420 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    .ns-scan-wrap { position: relative; overflow: hidden; }
+    .ns-scan-wrap::after {
+      content: '';
+      position: absolute; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--ocean), transparent);
+      animation: scanline 2.2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer   { to { background-position: -200% 0; } }
+    @keyframes scanline  { 0%{top:0;opacity:1} 100%{top:100%;opacity:0} }
+    @keyframes fadeUp    { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes badgePop  { 0%{transform:scale(0) rotate(-12deg);opacity:0} 65%{transform:scale(1.1) rotate(2deg)} 100%{transform:scale(1) rotate(0);opacity:1} }
+    @keyframes whalePulse{ 0%,100%{transform:scale(1);opacity:.85} 50%{transform:scale(1.06);opacity:1} }
+
+    .anim-fadeup   { animation: fadeUp   .6s cubic-bezier(.22,1,.36,1) forwards; }
+    .anim-badgepop { animation: badgePop .8s cubic-bezier(.34,1.56,.64,1) forwards; }
+    .anim-whale    { display:inline-block; animation: whalePulse 2.4s ease-in-out infinite; }
+
+    /* Header */
+    .ns-header {
+      background: rgba(7,8,16,.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Footer */
+    .ns-footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 24px;
+    }
+    .ns-footer a {
+      color: var(--ocean); text-decoration: none; font-weight: 600;
+      transition: opacity .15s;
+    }
+    .ns-footer a:hover { opacity: .7; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    #toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      background: #1a1c2a; border: 1px solid #2a2d40;
+      color: #e2e4f0; padding: 8px 22px; border-radius: 99px; font-size: 13px;
+      z-index: 999; transition: opacity .25s; white-space: nowrap;
+      box-shadow: 0 4px 24px rgba(0,0,0,.4);
+    }
+    #toast.hidden { opacity: 0; pointer-events: none; }
+
+    @media (max-width: 640px) {
+      #settings-panel {
+        border-radius: 20px 20px 0 0;
+        position: fixed; bottom: 0; left: 0; right: 0;
+        max-height: 90vh; overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════ SETTINGS MODAL ══════════════ -->
+  <div id="settings-modal"
+       class="hidden fixed inset-0 z-50 flex sm:items-center items-end justify-center sm:p-4 p-0"
+       style="background:rgba(0,0,0,.76);backdrop-filter:blur(6px);"
+       onclick="if(event.target===this) closeSettings()">
+
+    <div id="settings-panel" class="ns-card ns-modal-bg w-full sm:max-w-md p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-base">API Keys</h2>
+        <button onclick="closeSettings()"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-xl"
+                style="color:var(--muted)">×</button>
+      </div>
+
+      <div class="text-xs mb-4 px-3 py-3 rounded-xl leading-relaxed"
+           style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2);color:#818cf8;">
+        ℹ️ <strong>Vercel env vars don't apply to plain HTML.</strong><br>
+        Paste your keys here — saved only in your browser.
+      </div>
+      <div class="text-xs mb-5 px-3 py-2.5 rounded-xl"
+           style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);color:#d97706;">
+        🔒 Keys are stored in localStorage — never sent anywhere.
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <label class="text-sm font-medium block mb-2" style="color:var(--muted)">Etherscan API Key</label>
+          <input id="key-etherscan" type="password" autocomplete="off"
+                 placeholder="Your Etherscan key…"
+                 class="ns-input" style="padding:12px 16px;position:static;width:100%">
+          <div class="flex justify-between mt-1.5 text-xs" style="color:var(--muted)">
+            <span>Ethereum history</span>
+            <a href="https://etherscan.io/myapikey" target="_blank" rel="noopener"
+               style="color:var(--amber);text-decoration:underline">Free key →</a>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-2" style="color:var(--muted)">Helius API Key</label>
+          <input id="key-helius" type="password" autocomplete="off"
+                 placeholder="Your Helius key…"
+                 class="ns-input" style="padding:12px 16px;position:static;width:100%">
+          <div class="flex justify-between mt-1.5 text-xs" style="color:var(--muted)">
+            <span>Solana history</span>
+            <a href="https://dashboard.helius.dev" target="_blank" rel="noopener"
+               style="color:var(--amber);text-decoration:underline">Free key →</a>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveSettings()"
+              class="ns-btn-main w-full mt-6 rounded-xl py-3"
+              style="position:static;transform:none;font-size:14px">
+        Save Keys
+      </button>
+      <p id="save-ok" class="hidden text-center text-xs mt-3" style="color:var(--emerald)">
+        ✓ Keys saved!
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="ns-header sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center font-d text-white text-sm leading-none"
+             style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding-top:2px">N</div>
+        <span class="font-semibold tracking-tight">NewmannScan</span>
+        <span class="ns-version hidden sm:block text-xs px-2 py-0.5 rounded-full font-m"
+              style="background:#131420;color:var(--muted);border:1px solid var(--border)">v2</span>
+      </div>
+      <div class="flex items-center gap-0.5">
+        <button onclick="toggleTheme()" id="theme-btn" title="Toggle theme"
+                class="p-2.5 rounded-lg text-base hover:bg-white/5 transition-colors">🌙</button>
+        <button onclick="openSettings()" title="API Keys"
+                class="p-2.5 rounded-lg text-base hover:bg-white/5 transition-colors">⚙️</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════ MAIN ══════════════ -->
+  <main class="max-w-xl mx-auto px-4 pb-10" style="position:relative;z-index:1">
+
+    <!-- Hero -->
+    <div class="text-center pt-10 pb-8">
+      <h1 class="font-d tracking-wide leading-none mb-2"
+          style="font-size:clamp(2.8rem,10vw,4.6rem);
+                 background:linear-gradient(135deg,#93c5fd,#0ea5e9,#6366f1);
+                 -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+        WALLET HERITAGE
+      </h1>
+      <p class="text-sm" style="color:var(--muted)">
+        Age rank &amp; activity tier — Ethereum &amp; Solana
+      </p>
+    </div>
+
+    <!-- Search -->
+    <div class="relative mb-3">
+      <input id="wallet-input" type="text" class="ns-input"
+             placeholder="0x… Ethereum  or  Solana public key"
+             onkeydown="if(event.key==='Enter') scanWallet()">
+      <button onclick="scanWallet()" class="ns-btn-main">SCAN 🌊</button>
+    </div>
+
+    <!-- Chain detect -->
+    <div id="chain-hint" class="hidden mb-3 text-center text-xs" style="color:var(--muted)"></div>
+
+    <!-- Error -->
+    <div id="error-msg" class="hidden mb-4 px-4 py-3 rounded-xl text-sm text-center"
+         style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171"></div>
+
+    <!-- No-key hint -->
+    <div id="no-key-hint" class="hidden mb-4 px-4 py-3 rounded-xl text-xs text-center"
+         style="background:rgba(14,165,233,.05);border:1px solid rgba(14,165,233,.18);color:#38bdf8">
+      ⚠️ Solana scans need a Helius key.
+      <button onclick="openSettings()" class="underline font-semibold ml-1">Add keys →</button>
+    </div>
+
+    <!-- Skeleton -->
+    <div id="loading-state" class="hidden ns-card ns-scan-wrap p-5 space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full ns-shimmer flex-shrink-0"></div>
+        <div class="flex-1 space-y-2">
+          <div class="h-4 ns-shimmer w-2/5"></div>
+          <div class="h-3 ns-shimmer w-3/5"></div>
+        </div>
+        <div class="w-16 h-16 rounded-2xl ns-shimmer flex-shrink-0"></div>
+      </div>
+      <div class="h-24 ns-shimmer rounded-xl"></div>
+      <div class="h-28 ns-shimmer rounded-2xl"></div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div class="h-16 ns-shimmer"></div>
+        <div class="h-16 ns-shimmer"></div>
+        <div class="h-16 ns-shimmer"></div>
+        <div class="h-16 ns-shimmer"></div>
+      </div>
+      <p id="scan-status" class="text-center text-xs" style="color:var(--ocean)">Initialising scan…</p>
+    </div>
+
+    <!-- Results -->
+    <div id="results-card" class="hidden anim-fadeup">
+      <div class="ns-card overflow-hidden">
+
+        <div id="rank-bar" style="height:3px;width:100%"></div>
+
+        <div class="p-5 sm:p-6">
+
+          <!-- Identity -->
+          <div class="flex items-start justify-between gap-4 mb-5">
+            <div class="min-w-0 flex-1">
+              <div id="ens-name" class="hidden font-semibold truncate mb-0.5"
+                   style="color:var(--ocean);font-size:15px"></div>
+              <div class="flex items-center gap-1.5">
+                <span id="addr-display" class="font-m text-xs truncate" style="color:var(--muted)"></span>
+                <button onclick="copyAddress()" title="Copy"
+                        class="flex-shrink-0 px-1.5 py-1 rounded text-xs hover:bg-white/5 transition-colors"
+                        style="color:var(--muted)">📋</button>
+              </div>
+              <div class="flex gap-2 mt-2 flex-wrap">
+                <div id="chain-badge"
+                     class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
+                     style="background:#131420;border:1px solid var(--border)"></div>
+                <div id="marine-pill"
+                     class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"></div>
+              </div>
+            </div>
+
+            <!-- Age badge -->
+            <div id="rank-badge" class="ns-badge anim-badgepop flex-shrink-0 px-3 py-3 text-center"
+                 style="min-width:70px">
+              <div id="badge-icon"  class="text-2xl leading-none"></div>
+              <div id="badge-label" class="text-xs font-semibold mt-1 leading-tight" style="color:var(--ocean)"></div>
+              <div id="badge-sub"   class="text-xs mt-0.5" style="color:var(--muted);font-size:11px"></div>
+            </div>
+          </div>
+
+          <!-- Rank hero -->
+          <div class="ns-inset text-center py-7 mb-4">
+            <div class="text-xs tracking-widest mb-2 font-medium uppercase" style="color:var(--muted)">Primary Rank</div>
+            <div id="rank-title" class="font-d tracking-wide"
+                 style="font-size:clamp(3.5rem,14vw,5.5rem);line-height:1"></div>
+            <div id="rank-sub" class="text-xs mt-2" style="color:var(--muted)"></div>
+          </div>
+
+          <!-- Marine tier block -->
+          <div id="marine-block" class="ns-marine-block mb-5 p-4 text-center"
+               style="border:1px solid var(--border)">
+            <div id="marine-animal" style="font-size:2.8rem;line-height:1"></div>
+            <div id="marine-name"   class="font-d tracking-widest mt-2"
+                 style="font-size:1.9rem;line-height:1"></div>
+            <div id="marine-desc"   class="text-xs mt-1.5" style="color:var(--muted)"></div>
+            <div id="marine-basis"  class="text-xs mt-1" style="color:var(--muted);opacity:.6;font-size:11px"></div>
+          </div>
+
+          <!-- Stats grid -->
+          <div class="grid grid-cols-2 gap-2.5 mb-5">
+            <div class="ns-stat">
+              <div class="text-xs font-medium mb-1.5" style="color:var(--muted)">Genesis</div>
+              <div id="stat-genesis" class="font-m font-semibold" style="font-size:12px"></div>
+            </div>
+            <div class="ns-stat">
+              <div class="text-xs font-medium mb-1.5" style="color:var(--muted)">Wallet Age</div>
+              <div id="stat-age" class="text-sm font-semibold"></div>
+            </div>
+            <div class="ns-stat">
+              <div class="text-xs font-medium mb-1.5" style="color:var(--muted)">Transactions</div>
+              <div id="stat-txcount" class="font-m text-sm font-semibold"></div>
+            </div>
+            <div class="ns-stat">
+              <div class="text-xs font-medium mb-1.5" style="color:var(--muted)">Fees Spent (est.)</div>
+              <div id="stat-gas" class="text-sm font-semibold" style="color:var(--amber)"></div>
+              <div id="stat-gas-note" class="hidden text-xs mt-0.5" style="color:#374151;font-size:10px"></div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2">
+            <button onclick="shareResult()" class="ns-ghost-btn flex-1">Share 🔗</button>
             <button onclick="clearResults()" class="2px 16px; position: static; width: 100%;">
           <div class="flex justify-between mt-2 text-xs" style="color: var(--muted);">
             <span>For Solana transaction history</span>
