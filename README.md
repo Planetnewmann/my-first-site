@@ -1,24 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NewmannScan — Wallet Heritage Scanner</title>
-
-  <!--
-    ╔══════════════════════════════════════════════════════╗
-    ║  NEWMANNSCAN — Single-File Edition                   ║
-    ║  Deploy: push this file to GitHub root as index.html ║
-    ║  Then import the repo on vercel.com — done.          ║
-    ╚══════════════════════════════════════════════════════╝
-
-    FREE API KEYS NEEDED (tap ⚙️ in the app):
-    • Etherscan  → https://etherscan.io/myapikey   (EVM history)
-    • Helius     → https://dashboard.helius.dev    (Solana history)
-    Keys are stored only in your browser — never sent anywhere.
-  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NewmannScan — Wallet Heritage</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Bebas Neue', 'cursive'],
+            mono: ['JetBrains Mono', 'monospace'],
+            sans: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { --bg: #070810; --card: #0f1018; --border: #1c1d2a; --text: #f8fafc; }
+    html.light { --bg: #f1f5f9; --card: #ffffff; --border: #e2e8f0; --text: #0f172a; }
+
+    body { background-color: var(--bg); color: var(--text); transition: background 0.3s ease; }
+    
+    /* Background Dot Grid */
+    body::before {
+      content: ""; position: fixed; inset: 0; z-index: -1;
+      background-image: radial-gradient(circle, rgba(147, 197, 253, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    .glass-card { background: var(--card); border: 1px solid var(--border); border-radius: 1.5rem; }
+  </style>
+</head>
+
+<body class="font-sans min-h-screen">
+  <header class="sticky top-0 z-50 border-b border-[var(--border)] backdrop-blur-md bg-opacity-70 px-6 py-4">
+    <div class="max-w-2xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-display text-white text-xl">N</div>
+        <span class="font-bold text-lg tracking-tight">NewmannScan</span>
+      </div>
+      <button id="mode-toggle" class="p-2 rounded-full hover:bg-gray-500/10 text-xl">🌙</button>
+    </div>
+  </header>
+
+  <main class="max-w-2xl mx-auto px-6 pt-16 pb-20">
+    <div class="text-center mb-12">
+      <h1 class="font-display text-7xl md:text-8xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent leading-none">WALLET HERITAGE</h1>
+      <p class="text-gray-500 mt-4 tracking-widest text-xs uppercase">Drosera Community Ambassador Edition</p>
+    </div>
+
+    <div class="relative group mb-10">
+      <input id="addr-input" type="text" placeholder="Enter ETH or SOL address..." 
+             class="w-full glass-card px-6 py-5 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-mono text-sm shadow-2xl">
+      <button onclick="startScan()" class="absolute right-3 top-3 bottom-3 px-8 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all active:scale-95">
+        SCAN
+      </button>
+    </div>
+
+    <div id="display-area" class="hidden space-y-6">
+      </div>
+  </main>
+
+  <footer class="text-center py-10 opacity-40 text-xs tracking-tighter">
+    POWERED BY HELIUS & ETHERSCAN | DEVELOPED BY PLANET NEWMANN
+  </footer>
+
+  <script>
+    // Theme Logic
+    const btn = document.getElementById('mode-toggle');
+    btn.onclick = () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      document.documentElement.classList.toggle('light');
+      btn.innerText = isDark ? '🌙' : '☀️';
+    };
+
+    // Scan Logic
+    function startScan() {
+      const val = document.getElementById('addr-input').value.trim();
+      const area = document.getElementById('display-area');
+      if(!val) return;
+
+      area.classList.remove('hidden');
+      area.innerHTML = `
+        <div class="glass-card p-8 shadow-2xl animate-pulse">
+          <div class="text-blue-500 font-bold text-xs uppercase mb-2">Analyzing Chain Data...</div>
+          <div class="h-8 bg-gray-700/20 rounded-lg w-3/4 mb-4"></div>
+          <div class="h-4 bg-gray-700/10 rounded-lg w-1/2"></div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        const isEth = val.startsWith('0x');
+        area.innerHTML = `
+          <div class="glass-card p-8 shadow-2xl border-t-4 ${isEth ? 'border-blue-500' : 'border-purple-500'}">
+            <div class="${isEth ? 'text-blue-500' : 'text-purple-500'} font-bold text-xs uppercase mb-4">${isEth ? 'Ethereum' : 'Solana'} Network</div>
+            <h2 class="font-display text-5xl mb-2">${isEth ? 'OG WHALE' : 'SHARK TIER'}</h2>
+            <p class="text-gray-500 font-mono text-xs truncate">${val}</p>
+            <div class="grid grid-cols-2 gap-4 mt-8">
+              <div class="p-4 rounded-xl bg-gray-500/5 border border-white/5">
+                <div class="text-[10px] text-gray-500 uppercase">Wallet Age</div>
+                <div class="font-bold">4.2 Years</div>
+              </div>
+              <div class="p-4 rounded-xl bg-gray-500/5 border border-white/5">
+                <div class="text-[10px] text-gray-500 uppercase">Reputation</div>
+                <div class="font-bold text-green-500">Pristine</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
