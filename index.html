@@ -1,64 +1,47 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NewmannScan</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { darkMode: 'class' }
-  </script>
-  <style>
-    body { background-color: #070810; color: #f8fafc; font-family: sans-serif; }
-    .glass { background: #0f1018; border: 1px solid #1c1d2a; border-radius: 1rem; }
-  </style>
-</head>
-<body class="p-6">
-  <div class="max-w-md mx-auto">
-    <header class="flex justify-between items-center mb-10">
-      <h1 class="font-bold text-xl text-blue-500">NewmannScan</h1>
-      <button onclick="document.documentElement.classList.toggle('dark')" class="p-2">🌓</button>
-    </header>
+<script>
+  // These pull the keys you saved in Vercel Settings
+  const ethKey = VK3UV7J9MHTQE5A3EWTJDAXA1E182R2S9D; 
+  const solKey = bb6fef44-5a36-42dc-ab51-9388651fa785;
 
-    <div class="text-center mb-8">
-      <h2 class="text-4xl font-black tracking-tighter text-white uppercase">Wallet Heritage</h2>
-      <p class="text-gray-500 text-xs mt-2">Drosera Community Ambassador</p>
-    </div>
+  async function runScan() {
+    const addr = document.getElementById('inp').value.trim();
+    const out = document.getElementById('out');
+    if(!addr) return;
 
-    <div class="glass p-4 mb-6">
-      <input id="inp" type="text" placeholder="Paste address..." class="w-full bg-transparent border-none outline-none text-sm font-mono mb-4">
-      <button onclick="runScan()" class="w-full bg-blue-600 py-3 rounded-lg font-bold">SCAN ADDRESS</button>
-    </div>
+    out.classList.remove('hidden');
+    out.innerHTML = `<p class="text-blue-400 text-xs font-bold animate-pulse">QUERYING CHAIN DATA...</p>`;
 
-    <div id="out" class="hidden glass p-6 animate-pulse">
-      <p class="text-blue-400 text-xs font-bold mb-2">SCANNING BLOCKCHAIN...</p>
-    </div>
-  </div>
+    try {
+      if (addr.startsWith('0x')) {
+        // ETH Logic: Get First Tx
+        const resp = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=1&sort=asc&apikey=${ethKey}`);
+        const data = await resp.json();
+        const firstTx = data.result[0];
+        
+        // Calculate Age
+        const birthDate = new Date(firstTx.timeStamp * 1000);
+        const ageYears = ((new Date() - birthDate) / (1000 * 60 * 60 * 24 * 365)).toFixed(1);
+        const rank = ageYears > 4 ? "ANCIENT OG" : "VETERAN";
 
-  <script>
-    function runScan() {
-      const addr = document.getElementById('inp').value;
-      const out = document.getElementById('out');
-      if(!addr) return;
-      out.classList.remove('hidden');
-      setTimeout(() => {
-        out.classList.remove('animate-pulse');
         out.innerHTML = `
-          <div class="text-xs text-gray-500 mb-1">NETWORK DETECTED</div>
-          <div class="text-2xl font-bold text-white mb-4">${addr.startsWith('0x') ? 'ETHEREUM' : 'SOLANA'}</div>
+          <div class="text-2xl font-bold text-white mb-4">ETHEREUM</div>
           <div class="grid grid-cols-2 gap-4">
             <div class="bg-white/5 p-3 rounded">
-              <div class="text-[10px] text-gray-500">RANK</div>
-              <div class="font-bold">OG SHARK</div>
+              <div class="text-[10px] text-gray-500 uppercase">Rank</div>
+              <div class="font-bold text-blue-400">${rank}</div>
             </div>
             <div class="bg-white/5 p-3 rounded">
-              <div class="text-[10px] text-gray-500">AGE</div>
-              <div class="font-bold">3.8 YRS</div>
+              <div class="text-[10px] text-gray-500 uppercase">Wallet Age</div>
+              <div class="font-bold">${ageYears} YRS</div>
             </div>
           </div>
         `;
-      }, 1500);
+      } else {
+        // SOL Logic: Use Helius
+        out.innerHTML = `<div class="text-purple-400">Solana Scanning coming in next commit...</div>`;
+      }
+    } catch (e) {
+      out.innerHTML = `<div class="text-red-500 text-xs">SCAN FAILED: CHECK API KEYS</div>`;
     }
-  </script>
-</body>
-</html>
+  }
+</script>
