@@ -1,0 +1,17 @@
+app/
+  layout.tsx              # Root layout with ThemeProvider + metadata
+  page.tsx                # Search landing page
+  scan/[address]/page.tsx # Dynamic results page (SSR + client hybrid)
+components/
+  ThemeToggle.tsx         # Sun/Moon animated toggle
+  SearchBar.tsx           # Smart address input with chain detection
+  LegacyDashboard.tsx     # Main results card (tier + stats + share)
+  ScanProgress.tsx        # Animated scanning progress bar
+  TierBadge.tsx           # Animated nautical rank badge
+lib/
+  calculateLegacy.ts      # Tiering logic + USD gas normalization
+  resolveEns.ts           # Viem ENS reverse lookup
+  fetchEvm.ts             # Zerion multi-chain data fetcher
+  fetchSvm.ts             # Helius Solana data fetcher
+providers/
+  providers.tsx           # ThemeProvider (next-themes) wrapper
