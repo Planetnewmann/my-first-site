@@ -2,107 +2,637 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NewmannScan | Heritage</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070810" id="themeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NewmannScan">
+  <title>NewmannScan</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,700&family=Barlow+Condensed:ital,wght@0,300;0,700;0,900;1,900&display=swap" rel="stylesheet">
+
   <style>
-    body { background-color: #070810; color: #f8fafc; }
-    .glass { background: #0f1018; border: 1px solid #1c1d2a; border-radius: 1rem; }
-    .rank-gradient { background: linear-gradient(90deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    /* ── Design Tokens ── */
+    :root {
+      --bg:       #070810;
+      --bg2:      #0b0d18;
+      --card:     #0f1120;
+      --border:   rgba(255,255,255,0.07);
+      --text:     #f0f4ff;
+      --muted:    rgba(240,244,255,0.38);
+      --accent:   #3b82f6;
+      --accent2:  #6366f1;
+      --green:    #22c55e;
+    }
+    html.light {
+      --bg:       #f0f2f8;
+      --bg2:      #e4e7f2;
+      --card:     #ffffff;
+      --border:   rgba(0,0,0,0.08);
+      --text:     #0d0f1a;
+      --muted:    rgba(13,15,26,0.42);
+      --accent:   #2563eb;
+      --accent2:  #4f46e5;
+      --green:    #16a34a;
+    }
+
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 300;
+      min-height: 100dvh;
+      padding:
+        calc(env(safe-area-inset-top, 0px) + 1.25rem)
+        1.25rem
+        calc(env(safe-area-inset-bottom, 0px) + 2rem);
+      transition: background 0.35s, color 0.35s;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise texture ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Ambient glow blob ── */
+    .blob {
+      position: fixed;
+      top: -15vh; right: -15vw;
+      width: min(55vw, 280px);
+      height: min(55vw, 280px);
+      background: radial-gradient(circle, rgba(59,130,246,0.13) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    html.light .blob {
+      background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+    }
+
+    /* ── Layout wrapper ── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* ── Glass card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      transition: background 0.35s, border-color 0.35s;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+    }
+    .logo-row { display: flex; align-items: center; gap: 0.625rem; }
+    .logo-mark {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700; font-size: 1.05rem;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+    }
+    .logo-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: var(--text);
+    }
+    .theme-btn {
+      width: 44px; height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.35s, border-color 0.35s;
+      flex-shrink: 0;
+    }
+    .theme-btn:active { transform: scale(0.9); }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .hero-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(3rem, 17vw, 4.75rem);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+      color: var(--text);
+    }
+    .hero-title .accent { color: var(--accent); }
+    .hero-sub {
+      margin-top: 0.75rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* ── Chain selector ── */
+    .chain-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .chain-tab {
+      flex: 1;
+      padding: 0.65rem;
+      border-radius: 0.875rem;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+    .chain-tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(59,130,246,0.25);
+    }
+    .chain-tab:active { transform: scale(0.96); }
+
+    /* ── Input card ── */
+    .input-card { padding: 1.25rem; margin-bottom: 1rem; }
+    .addr-input {
+      display: block;
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.875rem;
+      padding: 0.875rem 1rem;
+      font-family: 'Space Mono', monospace;
+      /* 16px minimum prevents iOS zoom */
+      font-size: max(16px, 0.78rem);
+      color: var(--text);
+      outline: none;
+      margin-bottom: 0.875rem;
+      transition: border-color 0.2s, background 0.35s;
+      width: 100%;
+    }
+    .addr-input::placeholder { color: var(--muted); }
+    .addr-input:focus { border-color: var(--accent); }
+
+    .scan-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 0.875rem;
+      padding: 1.1rem;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      min-height: 56px;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+    }
+    .scan-btn:active { transform: scale(0.97); opacity: 0.9; }
+    .scan-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    /* ── Loading ── */
+    .spinner {
+      width: 26px; height: 26px;
+      border: 2px solid rgba(59,130,246,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Result card ── */
+    .result-card {
+      padding: 1.5rem;
+      border-top: 3px solid var(--accent);
+      animation: slideUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+    .label-tiny {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .addr-display {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .badge-verified {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      background: rgba(34,197,94,0.12);
+      color: var(--green);
+      white-space: nowrap;
+    }
+    .tier-display {
+      margin-bottom: 1.5rem;
+    }
+    .tier-label-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2.75rem, 14vw, 4rem);
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat-cell {
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+    .stat-val {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .stat-unit {
+      font-size: 0.6rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 3px;
+      text-transform: uppercase;
+    }
+    .result-footer {
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-note {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Error ── */
+    .error-msg {
+      text-align: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #ef4444;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0;
+    }
   </style>
 </head>
-<body class="p-6 font-sans">
-  <div class="max-w-md mx-auto">
-    <header class="flex justify-between items-center mb-10">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white">N</div>
-        <h1 class="font-bold text-lg tracking-tight">NewmannScan</h1>
+<body>
+  <div class="blob"></div>
+
+  <div class="wrap">
+
+    <!-- Header -->
+    <header>
+      <div class="logo-row">
+        <div class="logo-mark">N</div>
+        <span class="logo-name">NewmannScan</span>
       </div>
-      <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 opacity-50">🌓</button>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
     </header>
 
-    <div class="text-center mb-8">
-      <h2 class="text-4xl font-black tracking-tighter text-white uppercase">Wallet Heritage</h2>
-      <p class="text-gray-500 text-xs mt-2 tracking-widest uppercase">The First Circle</p>
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-title">Wallet<br><span class="accent">Heritage</span></div>
+      <p class="hero-sub">On-Chain Reputation Protocol</p>
     </div>
 
-    <div class="glass p-4 mb-6 shadow-2xl">
-      <input id="inp" type="text" placeholder="Paste ETH or SOL address..." 
-             class="w-full bg-transparent border-none outline-none text-sm font-mono mb-4 text-white placeholder-gray-600">
-      <button onclick="runScan()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-white active:scale-95 transition-all">
-        SCAN HERITAGE
+    <!-- Chain selector -->
+    <div class="chain-tabs">
+      <button class="chain-tab active" id="tab-eth" onclick="setChain('eth')">
+        ⟠ Ethereum
+      </button>
+      <button class="chain-tab" id="tab-sol" onclick="setChain('sol')">
+        ◎ Solana
       </button>
     </div>
 
-    <div id="out" class="hidden glass p-6 shadow-2xl border-t-2 border-blue-500/30"></div>
+    <!-- Input card -->
+    <div class="card input-card">
+      <input
+        id="addrInp"
+        type="text"
+        inputmode="text"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="0x... ETH Address"
+        class="addr-input"
+        onkeydown="if(event.key==='Enter')executeScan()"
+      >
+      <button id="scanBtn" class="scan-btn" onclick="executeScan()">
+        ANALYZE REPUTATION
+      </button>
+    </div>
+
+    <!-- Result area -->
+    <div id="resultArea"></div>
+
   </div>
 
   <script>
-    const ethKey = "VK3UV7J9MHTQE5A3EWTJDAXA1E182R2S9D";
-    const solKey = "bb6fef44-5a36-42dc-ab51-9388651fa785";
+    /* ─────────────────────────────────────────────
+       API Keys
+    ───────────────────────────────────────────── */
+    const KEYS = {
+      eth: 'VK3UV7J9MHTQE5A3EWTJDAXA1E182R2S9D',
+      sol: 'bb6fef44-5a36-42dc-ab51-9388651fa785'
+    };
 
-    async function runScan() {
-      const addr = document.getElementById('inp').value.trim();
-      const out = document.getElementById('out');
-      if(!addr) return;
-      
-      out.classList.remove('hidden');
-      out.innerHTML = `<div class="flex flex-col items-center gap-2">
-                         <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                         <p class="text-blue-400 text-[10px] font-bold tracking-widest">QUERYING ARCHIVES...</p>
-                       </div>`;
+    /* ─────────────────────────────────────────────
+       State
+    ───────────────────────────────────────────── */
+    let activeChain = 'eth';
+
+    /* ─────────────────────────────────────────────
+       Theme
+    ───────────────────────────────────────────── */
+    function toggleTheme() {
+      const html = document.documentElement;
+      const btn  = document.getElementById('themeBtn');
+      const meta = document.getElementById('themeColor');
+      const going_light = html.classList.contains('dark');
+      html.classList.toggle('dark',  !going_light);
+      html.classList.toggle('light',  going_light);
+      btn.textContent = going_light ? '☀️' : '🌙';
+      meta.setAttribute('content', going_light ? '#f0f2f8' : '#070810');
+    }
+
+    /* ─────────────────────────────────────────────
+       Chain selector
+    ───────────────────────────────────────────── */
+    function setChain(chain) {
+      activeChain = chain;
+      document.getElementById('tab-eth').classList.toggle('active', chain === 'eth');
+      document.getElementById('tab-sol').classList.toggle('active', chain === 'sol');
+      const inp = document.getElementById('addrInp');
+      inp.placeholder = chain === 'eth' ? '0x... ETH Address' : 'Solana Wallet Address';
+      inp.value = '';
+      document.getElementById('resultArea').innerHTML = '';
+    }
+
+    /* ─────────────────────────────────────────────
+       Tier logic  (consistent with spec)
+         WHALE       totalGas > 1.0 ETH
+         SHARK       totalGas > 0.1 ETH
+         OG SURVIVOR age > 3.5 years
+         SHRIMP      everyone else
+    ───────────────────────────────────────────── */
+    function getTier(totalGas, ageYears) {
+      if (totalGas > 1.0)  return { label: 'WHALE',       color: '#3b82f6' };
+      if (totalGas > 0.1)  return { label: 'SHARK',       color: '#6366f1' };
+      if (ageYears > 3.5)  return { label: 'OG SURVIVOR', color: '#22c55e' };
+      return                      { label: 'SHRIMP',       color: '#94a3b8' };
+    }
+
+    /* ─────────────────────────────────────────────
+       Validation helpers
+    ───────────────────────────────────────────── */
+    function isValidEth(addr) {
+      return typeof addr === 'string' && /^0x[0-9a-fA-F]{40}$/.test(addr);
+    }
+    function isValidSol(addr) {
+      return typeof addr === 'string' && addr.length >= 32 && addr.length <= 44 && !/\s/.test(addr);
+    }
+
+    /* ─────────────────────────────────────────────
+       Main scan dispatcher
+    ───────────────────────────────────────────── */
+    async function executeScan() {
+      const addr = document.getElementById('addrInp').value.trim();
+      const area = document.getElementById('resultArea');
+      const btn  = document.getElementById('scanBtn');
+
+      /* Validate */
+      if (activeChain === 'eth' && !isValidEth(addr)) {
+        renderError(area, 'Enter a valid Ethereum address (0x + 40 hex chars).');
+        return;
+      }
+      if (activeChain === 'sol' && !isValidSol(addr)) {
+        renderError(area, 'Enter a valid Solana wallet address.');
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'SCANNING…';
+      renderLoading(area);
 
       try {
-        if (addr.startsWith('0x')) {
-          const res = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=1&sort=asc&apikey=${ethKey}`);
-          const data = await res.json();
-          
-          if (!data.result || data.result.length === 0 || typeof data.result === 'string') {
-            render(out, "ETHEREUM", "NEWBORN", "0.0", "0.000");
-            return;
-          }
-
-          const tx = data.result[0];
-          const birthDate = new Date(tx.timeStamp * 1000);
-          const age = ((new Date() - birthDate) / (1000*60*60*24*365)).toFixed(1);
-          
-          // Calculate Gas Burned on first Tx (GasUsed * GasPrice in Gwei/Eth)
-          const gasBurned = (parseInt(tx.gasUsed) * parseInt(tx.gasPrice) / 1e18).toFixed(4);
-
-          let rank = "SURVIVOR";
-          if (age > 4) rank = "ANCIENT OG";
-          else if (age > 2) rank = "VETERAN";
-
-          render(out, "ETHEREUM", rank, age, gasBurned);
+        if (activeChain === 'eth') {
+          await scanEthereum(addr, area);
         } else {
-          // Solana basic fetch logic
-          render(out, "SOLANA", "SVM EXPLORER", "SCANNING", "0.00");
+          await scanSolana(addr, area);
         }
-      } catch (e) {
-        out.innerHTML = `<p class="text-red-500 text-xs text-center">API LIMIT REACHED or INVALID ADDR</p>`;
+      } catch (err) {
+        renderError(area, 'Network error — check your connection and try again.');
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'ANALYZE REPUTATION';
       }
     }
 
-    function render(el, chain, rank, age, gas) {
+    /* ─────────────────────────────────────────────
+       Ethereum scan
+    ───────────────────────────────────────────── */
+    async function scanEthereum(addr, area) {
+      const url = `https://api.etherscan.io/api?module=account&action=txlist` +
+                  `&address=${encodeURIComponent(addr)}` +
+                  `&startblock=0&endblock=99999999&page=1&offset=100&sort=asc` +
+                  `&apikey=${KEYS.eth}`;
+
+      const res  = await fetch(url);
+      const data = await res.json();
+
+      /* No transactions or error from API */
+      if (data.status === '0' || !Array.isArray(data.result) || data.result.length === 0) {
+        renderResult(area, {
+          chain:    'eth',
+          address:  addr,
+          tier:     { label: 'NEWBORN', color: '#94a3b8' },
+          ageYears: 0,
+          gasEth:   0,
+          txCount:  0
+        });
+        return;
+      }
+
+      const txList = data.result;
+
+      /* Age: use timestamp of earliest transaction */
+      const firstTimestampMs = Number(txList[0].timeStamp) * 1000;
+      const ageMs     = Date.now() - firstTimestampMs;
+      const ageYears  = ageMs > 0 ? ageMs / (1000 * 60 * 60 * 24 * 365.25) : 0;
+
+      /* Gas spent in ETH: sum over all txs of (gasUsed × gasPrice) / 1e18 */
+      let totalGasWei = 0;
+      for (const tx of txList) {
+        const gasUsed  = parseInt(tx.gasUsed,  10) || 0;
+        const gasPrice = parseInt(tx.gasPrice, 10) || 0;
+        totalGasWei += gasUsed * gasPrice;
+      }
+      const gasEth = totalGasWei / 1e18;
+
+      renderResult(area, {
+        chain:    'eth',
+        address:  addr,
+        tier:     getTier(gasEth, ageYears),
+        ageYears: ageYears,
+        gasEth:   gasEth,
+        txCount:  txList.length
+      });
+    }
+
+    /* ─────────────────────────────────────────────
+       Solana scan  (Helius API)
+    ───────────────────────────────────────────── */
+    async function scanSolana(addr, area) {
+      /* Fetch recent signatures */
+      const sigUrl = `https://mainnet.helius-rpc.com/?api-key=${KEYS.sol}`;
+
+      const sigRes = await fetch(sigUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0', id: 1,
+          method: 'getSignaturesForAddress',
+          params: [addr, { limit: 100 }]
+        })
+      });
+      const sigData = await sigRes.json();
+      const sigs    = sigData?.result;
+
+      if (!Array.isArray(sigs) || sigs.length === 0) {
+        renderResult(area, {
+          chain:    'sol',
+          address:  addr,
+          tier:     { label: 'NEWBORN', color: '#94a3b8' },
+          ageYears: 0,
+          gasEth:   0,
+          txCount:  0
+        });
+        return;
+      }
+
+      /* Age from oldest signature blockTime */
+      const oldest        = sigs[sigs.length - 1];
+      const firstMs       = (oldest.blockTime || 0) * 1000;
+      const ageYears      = firstMs > 0 ? (Date.now() - firstMs) / (1000 * 60 * 60 * 24 * 365.25) : 0;
+
+      /* Fees: sum lamports fee from signatures (1 SOL = 1e9 lamports) */
+      let totalFeeLamports = 0;
+      for (const sig of sigs) {
+        totalFeeLamports += parseInt(sig.fee || sig.meta?.fee || 0, 10) || 0;
+      }
+      /* Convert to SOL then display as-is (same tier logic, SOL ≈ ETH for UX) */
+      const gasEth = totalFeeLamports / 1e9;
+
+      renderResult(area, {
+        chain:    'sol',
+        address:  addr,
+        tier:     getTier(gasEth, ageYears),
+        ageYears: ageYears,
+        gasEth:   gasEth,
+        txCount:  sigs.length
+      });
+    }
+
+    /* ─────────────────────────────────────────────
+       Render helpers
+    ───────────────────────────────────────────── */
+    function renderLoading(el) {
       el.innerHTML = `
-        <div class="flex justify-between items-center mb-4">
-          <span class="text-[10px] text-gray-500 font-bold tracking-widest uppercase">${chain}</span>
-          <span class="text-[10px] text-green-500 font-bold uppercase tracking-widest">● Live Data</span>
-        </div>
-        <div class="text-3xl font-black text-white mb-6 tracking-tight">${rank}</div>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-white/5 p-4 rounded-xl border border-white/5">
-            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Wallet Age</div>
-            <div class="font-bold text-blue-400 text-xl">${age} <span class="text-xs font-normal text-gray-400">YRS</span></div>
-          </div>
-          <div class="bg-white/5 p-4 rounded-xl border border-white/5">
-            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Genesis Gas</div>
-            <div class="font-bold text-purple-400 text-xl">${gas} <span class="text-xs font-normal text-gray-400">ETH</span></div>
-          </div>
+        <div class="card result-card" style="display:flex;flex-direction:column;align-items:center;padding:2.5rem 1.5rem;gap:0.75rem;">
+          <div class="spinner"></div>
+          <p style="font-size:0.6rem;letter-spacing:0.22em;text-transform:uppercase;font-weight:700;color:var(--accent);">COLLECTING DATA</p>
         </div>`;
     }
-  </script>
-</body>
-      </html>
-  
+
+    function renderError(el, msg) {
+      el.innerHTML = `
+        <div class="card result-card">
+          <p class="error-msg">${msg}</p>
+        </div>`;
+    }
+
+    function renderResult(el, { chain, address, tier, ageYears, gasEth, txCount }) {
+      /* Safe display values — guard against NaN */
+      const safeAge = isFinite(ageYears) && ageYears > 0 ? ageYears.toFixed(1) : '0.0';
+      const safeGas = isFinite(gasEth)   && gasEth   > 0 ? gasEth.toFixed(4)   : '0.0000';
+
+      const isEth  = chain === 'eth';
+      const short  = isEth
+        ? address.slice(0,6) + '…' + address.slice(-4)
+        : address.slice(0,4) + '…' + address.slice(-4);
+
+      const gasLabel = isEth ? 'Gas Spent' : 'Fees Paid';
+      const gasUnit
