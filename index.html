@@ -1,47 +1,84 @@
-<script>
-  // These pull the keys you saved in Vercel Settings
-  const ethKey = VK3UV7J9MHTQE5A3EWTJDAXA1E182R2S9D; 
-  const solKey = bb6fef44-5a36-42dc-ab51-9388651fa785;
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewmannScan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <style>
+    body { background-color: #070810; color: #f8fafc; }
+    .glass { background: #0f1018; border: 1px solid #1c1d2a; border-radius: 1rem; }
+  </style>
+</head>
+<body class="p-6 font-sans">
+  <div class="max-w-md mx-auto">
+    <header class="flex justify-between items-center mb-10">
+      <h1 class="font-bold text-xl text-blue-500">NewmannScan</h1>
+      <button onclick="document.documentElement.classList.toggle('dark')" class="p-2">🌓</button>
+    </header>
 
-  async function runScan() {
-    const addr = document.getElementById('inp').value.trim();
-    const out = document.getElementById('out');
-    if(!addr) return;
+    <div class="text-center mb-8">
+      <h2 class="text-4xl font-black tracking-tighter text-white uppercase">Wallet Heritage</h2>
+      <p class="text-gray-500 text-xs mt-2">Drosera Community Ambassador</p>
+    </div>
 
-    out.classList.remove('hidden');
-    out.innerHTML = `<p class="text-blue-400 text-xs font-bold animate-pulse">QUERYING CHAIN DATA...</p>`;
+    <div class="glass p-4 mb-6">
+      <input id="inp" type="text" placeholder="Paste ETH or SOL address..." class="w-full bg-transparent border-none outline-none text-sm font-mono mb-4 text-white">
+      <button onclick="runScan()" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white active:scale-95 transition-transform">SCAN ADDRESS</button>
+    </div>
 
-    try {
-      if (addr.startsWith('0x')) {
-        // ETH Logic: Get First Tx
-        const resp = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=1&sort=asc&apikey=${ethKey}`);
-        const data = await resp.json();
-        const firstTx = data.result[0];
-        
-        // Calculate Age
-        const birthDate = new Date(firstTx.timeStamp * 1000);
-        const ageYears = ((new Date() - birthDate) / (1000 * 60 * 60 * 24 * 365)).toFixed(1);
-        const rank = ageYears > 4 ? "ANCIENT OG" : "VETERAN";
+    <div id="out" class="hidden glass p-6"></div>
+  </div>
 
-        out.innerHTML = `
-          <div class="text-2xl font-bold text-white mb-4">ETHEREUM</div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white/5 p-3 rounded">
-              <div class="text-[10px] text-gray-500 uppercase">Rank</div>
-              <div class="font-bold text-blue-400">${rank}</div>
-            </div>
-            <div class="bg-white/5 p-3 rounded">
-              <div class="text-[10px] text-gray-500 uppercase">Wallet Age</div>
-              <div class="font-bold">${ageYears} YRS</div>
-            </div>
-          </div>
-        `;
-      } else {
-        // SOL Logic: Use Helius
-        out.innerHTML = `<div class="text-purple-400">Solana Scanning coming in next commit...</div>`;
+  <script>
+    // ── PASTE YOUR KEYS HERE ──
+    const ethKey = "VK3UV7J9MHTQE5A3EWTJDAXA1E182R2S9D";
+    const solKey = "bb6fef44-5a36-42dc-ab51-9388651fa785";
+
+    async function runScan() {
+      const addr = document.getElementById('inp').value.trim();
+      const out = document.getElementById('out');
+      if(!addr) return;
+      
+      out.classList.remove('hidden');
+      out.innerHTML = `<p class="text-blue-400 text-xs font-bold animate-pulse">ANALYZING HERITAGE...</p>`;
+
+      try {
+        if (addr.startsWith('0x')) {
+          const res = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=1&sort=asc&apikey=${ethKey}`);
+          const data = await res.json();
+          const birthDate = new Date(data.result[0].timeStamp * 1000);
+          const age = ((new Date() - birthDate) / (1000*60*60*24*365)).toFixed(1);
+          render(out, "ETHEREUM", age > 3 ? "OG ANCIENT" : "VETERAN", age);
+        } else {
+          const res = await fetch(`https://mainnet.helius-rpc.com/?api-key=${solKey}`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ jsonrpc: "2.0", id: "1", method: "getAsset", params: { id: addr } })
+          });
+          render(out, "SOLANA", "SVM EXPLORER", "Scanning...");
+        }
+      } catch (e) {
+        out.innerHTML = `<p class="text-red-500 text-xs">SCAN ERROR: CHECK KEYS</p>`;
       }
-    } catch (e) {
-      out.innerHTML = `<div class="text-red-500 text-xs">SCAN FAILED: CHECK API KEYS</div>`;
     }
-  }
-</script>
+
+    function render(el, chain, rank, age) {
+      el.innerHTML = `
+        <div class="text-xs text-gray-500 mb-1 font-bold">${chain}</div>
+        <div class="text-2xl font-bold text-white mb-4">${rank}</div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-white/5 p-3 rounded">
+            <div class="text-[10px] text-gray-500 uppercase">Age</div>
+            <div class="font-bold text-blue-400">${age} YRS</div>
+          </div>
+          <div class="bg-white/5 p-3 rounded">
+            <div class="text-[10px] text-gray-500 uppercase">Status</div>
+            <div class="font-bold text-green-500">ACTIVE</div>
+          </div>
+        </div>`;
+    }
+  </script>
+</body>
+      </html>
+      
